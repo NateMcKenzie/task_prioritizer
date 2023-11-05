@@ -48,3 +48,6 @@ app.*.map.json
 /windows/
 /web/
 /linux/
+
+# VS code
+launch.json

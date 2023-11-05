@@ -17,3 +17,17 @@
    - Create node for value
    - Merge new node into existing tree
 - `merge(node1 : node, node2 : node)` : node 
+## Node Object
+- value : generic
+- left : node
+- right : node
+- npl : int
+- `updateNpl()`
+    - if one child is null, npl = 0
+    - else
+    - npl = min of children's npl + 1
+
+# MVP Test screen
+- Field for each item in task.
+- "Save" button will just add to queue for now.
+- "pop" button to display next item off queue
