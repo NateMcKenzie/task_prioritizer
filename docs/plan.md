@@ -8,7 +8,8 @@
 
 # Priority Queue
 
-- I will make my own leftist heap
+- I will make my own ~~leftist heap~~ skew heap
+    - I changed to a skew heap because dataset will be small enought that is worth saving the effort
 - `pop()` : Generic - value of node 
    - Remove root node.
    - Return root value.

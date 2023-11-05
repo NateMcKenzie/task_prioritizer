@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'leftist_heap.dart';
+import 'skew_heap.dart';
 
 void main() {
-  LeftistHeap<int> heap = LeftistHeap(1);
-  print(heap.pop());
   runApp(const MyApp());
 }
 
