@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _taskDescriptionController = TextEditingController();
   final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
-  final SkewHeap _taskHeap = SkewHeap();
+  final SkewHeap<Task> _taskHeap = SkewHeap();
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +133,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget taskList() {
-    return Text(_taskHeap.topThree().toString());
+    List<Task?> tasks = _taskHeap.topThree();
+    if (tasks.isEmpty) return Container(); // Empty container because there's nothing to draw.
+    List<Widget> widgets = [];
+    for (int i = 0; i < 3; i++) {
+      if (tasks[i] != null) widgets.add(Text(tasks[i].toString()));
+    }
+    return Container(
+        margin: const EdgeInsets.all(8),
+        child: Column(
+          children: widgets,
+        ));
   }
 }
