@@ -124,8 +124,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       ElevatedButton(
         onPressed: () {
-          Task popped = _taskHeap.pop() as Task;
-          print(popped.toString());
+          setState(() {
+            Task popped = _taskHeap.pop() as Task;
+            print(popped.toString());
+          });
         },
         child: const Text('Pop'),
       ),

@@ -7,10 +7,17 @@ class Task implements Comparable {
 
   Task(this.name, this.description, this.requiredEstimate, this.dueDate, this.timeSpent);
 
-  //Possibly the trickiest part of this whole thing. Experiment as needed.
   @override
   int compareTo(other) {
-    return dueDate.compareTo(other.dueDate);
+    return getPriority().compareTo(other.getPriority());
+  }
+
+  //Possibly the trickiest part of this whole thing. Experiment as needed.
+  int getPriority() {
+    Duration timeLeft = dueDate.difference(DateTime.now());
+    int minutesLeft = timeLeft.inMinutes;
+    int minutesRequired = requiredEstimate.inMinutes - timeSpent.inMinutes;
+    return minutesLeft - minutesRequired;
   }
 
   @override
