@@ -1,15 +1,15 @@
 class SkewHeap<T extends Comparable> {
-  Node? root;
+  Node<T>? root;
 
   SkewHeap() {
     root = null;
   }
 
-  Comparable<dynamic> pop() {
+  T? pop() {
     if (root == null) {
-      throw Exception('Heap is empty');
+      return null;
     }
-    Comparable<dynamic> value = root!.value;
+    T value = root!.value;
     root = merge(root!.left, root!.right);
     return value;
   }
@@ -23,23 +23,38 @@ class SkewHeap<T extends Comparable> {
     }
   }
 
-  Node? merge(Node? n1, Node? n2) {
+  Node<T>? merge(Node<T>? n1, Node<T>? n2) {
     if (n1 == null) return n2;
     if (n2 == null) return n1;
-    Node small = n2;
-    Node large = n1;
+    Node<T> small = n2;
+    Node<T> large = n1;
     if (n1.compareTo(n2) <= 0) {
       small = n1;
       large = n2;
     }
     small.right = merge(small.right, large);
-    return small.swapChildren();
+    small.swapChildren();
+    return small;
+  }
+
+  List<T?> topThree() {
+    if (root == null) return [];
+    List<T?> topThree = [];
+    while (topThree.length < 3) {
+      topThree.add(pop());
+    }
+    for (int i = 0; i < 3; i++) {
+      if (topThree[i] == null) break;
+      insert(topThree[i]!);
+    }
+
+    return topThree;
   }
 }
 
 class Node<T extends Comparable> implements Comparable {
-  Node? left;
-  Node? right;
+  Node<T>? left;
+  Node<T>? right;
   T value;
 
   Node(this.value);
@@ -49,10 +64,14 @@ class Node<T extends Comparable> implements Comparable {
     return value.compareTo(other.value);
   }
 
-  Node<Comparable>? swapChildren() {
-    Node? temp = left;
+  void swapChildren() {
+    Node<T>? temp = left;
     left = right;
     right = temp;
-    return this;
+  }
+
+  @override
+  String toString() {
+    return value.toString();
   }
 }
