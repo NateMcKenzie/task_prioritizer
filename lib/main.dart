@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/task.dart';
+import 'package:task_prioritizer/task_card.dart';
 
 void main() {
   runApp(const TaskApp());
@@ -26,7 +27,6 @@ class TaskApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -39,18 +39,20 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
   final BinaryHeap<Task> _taskHeap = BinaryHeap.empty();
+  bool _editing = false;
+  List<Task> _sortedTasks = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
-        body: Column(children: [
+        body: ListView(children: [
           Form(
               child: Container(
             margin: const EdgeInsets.all(80),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: formInputs(),
+              children: pager(),
             ),
           )),
         ]));
@@ -58,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> formInputs() {
     return [
+      taskDisplay(),
       Container(
         margin: const EdgeInsets.all(8),
         child: TextFormField(
@@ -130,14 +133,46 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: const Text('Pop'),
       ),
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            sortTasks();
+            _editing = true;
+          });
+        },
+        child: const Text('Edit Tasks'),
+      )
     ];
   }
 
-  Widget taskList() {
-    Task? topTask = _taskHeap.peek();
-    if (topTask == null) {
+  //TODO: Not correct, but I need the state and don't want to move it yet.
+  List<Widget> pager() {
+    if (_editing) {
+      return editPage();
+    }
+    return formInputs();
+  }
+
+  List<Widget> editPage() {
+    List<Widget> returnValue = [];
+    for (Task task in _sortedTasks) {
+      returnValue.add(taskCard(task));
+    }
+    return returnValue;
+  }
+
+  Widget taskDisplay() {
+    if (_taskHeap.isEmpty) {
       return Container(); // Empty container because there's nothing to draw.
     }
-    return Text(topTask.toString());
+    Task topTask = _taskHeap.peek();
+    return taskCard(topTask);
+  }
+
+  void sortTasks() {
+    _sortedTasks = [];
+    while (!_taskHeap.isEmpty) {
+      _sortedTasks.add(_taskHeap.pop());
+    }
   }
 }

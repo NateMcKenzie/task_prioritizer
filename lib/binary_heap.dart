@@ -1,15 +1,16 @@
 class BinaryHeap<T extends Comparable> {
   List<T> _heap = [];
+  get isEmpty => _heap.isEmpty;
 
-  BinaryHeap.fromList(List<T> list){
+  BinaryHeap.fromList(List<T> list) {
     this._heap = List.from(list);
   }
 
   BinaryHeap.empty();
 
-  T? pop() {
+  T pop() {
     if (_heap.isEmpty) {
-      return null;
+      throw StateError('Heap is empty. Cannot extract minimum element.');
     }
 
     // Pop root, move last element to root
@@ -55,7 +56,11 @@ class BinaryHeap<T extends Comparable> {
     return returnValue;
   }
 
-  T? peek(){
+  T peek() {
+    if (_heap.isEmpty) {
+      throw StateError('Heap is empty. Cannot extract minimum element.');
+    }
+
     return _heap[0];
   }
 
@@ -90,5 +95,4 @@ class BinaryHeap<T extends Comparable> {
   int _rightChild(int index) {
     return (index * 2) + 2;
   }
-
 }
