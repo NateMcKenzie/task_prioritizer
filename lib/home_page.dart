@@ -6,9 +6,7 @@ import 'package:task_prioritizer/task.dart';
 import 'package:task_prioritizer/task_card.dart';
 
 class HomePage extends StatefulWidget {
-  final String title;
-
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,23 +18,18 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
 
-  //TODO: move
-  List<Task> _sortedTasks = [];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        body: ListView(children: [
-          Form(
-              child: Container(
-            margin: const EdgeInsets.all(80),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: formInputs(),
-            ),
-          )),
-        ]));
+    return ListView(children: [
+      Form(
+          child: Container(
+        margin: const EdgeInsets.all(80),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: formInputs(),
+        ),
+      )),
+    ]);
   }
 
   List<Widget> formInputs() {
@@ -102,14 +95,6 @@ class _HomePageState extends State<HomePage> {
         child: const Text('Pop'),
       ),
     ];
-  }
-
-  List<Widget> editPage() {
-    List<Widget> returnValue = [];
-    for (Task task in _sortedTasks) {
-      returnValue.add(taskCard(task));
-    }
-    return returnValue;
   }
 
   Widget taskDisplay() {

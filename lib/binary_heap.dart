@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:task_prioritizer/task.dart';
 
 class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
   List<T> _heap = [];
   get isEmpty => _heap.isEmpty;
 
+  BinaryHeapModel.empty();
+
   BinaryHeapModel.fromList(List<T> list) {
     this._heap = List.from(list);
   }
 
-  BinaryHeapModel.empty();
+  BinaryHeapModel<T> clone() {
+    return BinaryHeapModel.fromList(_heap);
+  }
 
   T pop() {
     if (_heap.isEmpty) {
