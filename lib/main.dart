@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:task_prioritizer/skew_heap.dart';
+import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/task.dart';
 
 void main() {
@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _taskDescriptionController = TextEditingController();
   final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
-  final SkewHeap<Task> _taskHeap = SkewHeap();
+  final BinaryHeap<Task> _taskHeap = BinaryHeap.empty();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
               children: formInputs(),
             ),
           )),
-          taskList(),
         ]));
   }
 
@@ -97,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: TextFormField(
           decoration: const InputDecoration(
             icon: Icon(Icons.calendar_today),
-            hintText: 'mm/dd/yyyy',
+            hintText: 'yyyy-mm-ddThh:mm',
             labelText: 'Due Date',
           ),
           controller: _taskDueDateController,
@@ -135,16 +134,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget taskList() {
-    List<Task?> tasks = _taskHeap.topThree();
-    if (tasks.isEmpty) return Container(); // Empty container because there's nothing to draw.
-    List<Widget> widgets = [];
-    for (int i = 0; i < 3; i++) {
-      if (tasks[i] != null) widgets.add(Text(tasks[i].toString()));
+    Task? topTask = _taskHeap.peek();
+    if (topTask == null) {
+      return Container(); // Empty container because there's nothing to draw.
     }
-    return Container(
-        margin: const EdgeInsets.all(8),
-        child: Column(
-          children: widgets,
-        ));
+    return Text(topTask.toString());
   }
 }

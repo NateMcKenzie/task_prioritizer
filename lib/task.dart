@@ -5,7 +5,8 @@ class Task implements Comparable {
   String name;
   String description;
 
-  Task(this.name, this.description, this.requiredEstimate, this.dueDate, this.timeSpent);
+  Task(this.name, this.description, this.requiredEstimate, this.dueDate,
+      this.timeSpent);
 
   @override
   int compareTo(other) {
