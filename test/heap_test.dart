@@ -20,7 +20,7 @@ void priorityQueue() {
   47,47,49,52,53,53,53,54,54,54,54,54,55,55,58,60,61,62,64,64,64,65,65,67,67,69,69,69,69,70,71,72,
   73,74,74,76,76,78,81,82,82,83,83,84,85,85,85,86,86,87,87,88,88,89,91,91,93,93,94,95,98];
 
-  BinaryHeap<int> heap = BinaryHeap.empty();
+  BinaryHeapModel<int> heap = BinaryHeapModel.empty();
   for (int i in unsorted) {
     heap.insert(i);
   }

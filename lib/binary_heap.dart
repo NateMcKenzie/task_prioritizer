@@ -1,12 +1,14 @@
-class BinaryHeap<T extends Comparable> {
+import 'package:flutter/material.dart';
+
+class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
   List<T> _heap = [];
   get isEmpty => _heap.isEmpty;
 
-  BinaryHeap.fromList(List<T> list) {
+  BinaryHeapModel.fromList(List<T> list) {
     this._heap = List.from(list);
   }
 
-  BinaryHeap.empty();
+  BinaryHeapModel.empty();
 
   T pop() {
     if (_heap.isEmpty) {
@@ -53,6 +55,7 @@ class BinaryHeap<T extends Comparable> {
       }
     }
 
+    notifyListeners();
     return returnValue;
   }
 
@@ -76,6 +79,7 @@ class BinaryHeap<T extends Comparable> {
       pivot = parent;
       parent = _parent(pivot);
     }
+    notifyListeners();
   }
 
   void _swap(int index1, int index2) {
