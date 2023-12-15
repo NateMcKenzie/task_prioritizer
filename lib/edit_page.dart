@@ -15,7 +15,8 @@ class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> taskCards = [];
-    BinaryHeapModel<Task> originalHeap = Provider.of<BinaryHeapModel<Task>>(context, listen: false);
+    BinaryHeapModel<Task> originalHeap =
+        Provider.of<BinaryHeapModel<Task>>(context, listen: false);
     BinaryHeapModel<Task> cloneHeap = originalHeap.clone();
     while (!cloneHeap.isEmpty) {
       taskCards.add(taskCard(cloneHeap.pop()));

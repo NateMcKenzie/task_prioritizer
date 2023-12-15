@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_prioritizer/task.dart';
 
 class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
   List<T> _heap = [];

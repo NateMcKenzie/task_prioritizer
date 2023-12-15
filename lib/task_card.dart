@@ -33,13 +33,16 @@ Widget taskCard(Task task) {
                         color: Colors.black,
                         width: 1.0,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(8.0)),
                     ),
                     child: Column(
                       children: [
-                        Text("Estimated: ${formatDuration(task.requiredEstimate)}"),
+                        Text(
+                            "Estimated: ${formatDuration(task.requiredEstimate)}"),
                         Text("Spent: ${formatDuration(task.timeSpent)}"),
-                        Text("Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
+                        Text(
+                            "Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
                       ],
                     )),
               ),
@@ -82,13 +85,16 @@ Widget editTaskCard(Task task) {
                         color: Colors.black,
                         width: 1.0,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(8.0)),
                     ),
                     child: Column(
                       children: [
-                        Text("Estimated: ${formatDuration(task.requiredEstimate)}"),
+                        Text(
+                            "Estimated: ${formatDuration(task.requiredEstimate)}"),
                         Text("Spent: ${formatDuration(task.timeSpent)}"),
-                        Text("Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
+                        Text(
+                            "Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
                       ],
                     )),
               ),

@@ -14,8 +14,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskNameController = TextEditingController();
-  final TextEditingController _taskDescriptionController = TextEditingController();
-  final TextEditingController _taskTimeEstimateController = TextEditingController();
+  final TextEditingController _taskDescriptionController =
+      TextEditingController();
+  final TextEditingController _taskTimeEstimateController =
+      TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
 
   @override
@@ -65,7 +67,9 @@ class _HomePageState extends State<HomePage> {
               hintText: 'How many hours will it take?',
               labelText: 'Time Estimate',
             ),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
+            ],
             controller: _taskTimeEstimateController,
           )),
       Container(
@@ -88,7 +92,9 @@ class _HomePageState extends State<HomePage> {
       ElevatedButton(
         onPressed: () {
           setState(() {
-            Task popped = Provider.of<BinaryHeapModel<Task>>(context, listen: false).pop();
+            Task popped =
+                Provider.of<BinaryHeapModel<Task>>(context, listen: false)
+                    .pop();
             print(popped.toString());
           });
         },
@@ -112,9 +118,11 @@ class _HomePageState extends State<HomePage> {
     String taskDescription = _taskDescriptionController.text;
     double taskTimeEstimate = double.parse(_taskTimeEstimateController.text);
     DateTime taskDueDate = DateTime.parse(_taskDueDateController.text);
-    Duration taskTimeDuration =
-        Duration(hours: taskTimeEstimate.toInt(), minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
-    Task newTask = Task(taskName, taskDescription, taskTimeDuration, taskDueDate, Duration.zero);
+    Duration taskTimeDuration = Duration(
+        hours: taskTimeEstimate.toInt(),
+        minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
+    Task newTask = Task(taskName, taskDescription, taskTimeDuration,
+        taskDueDate, Duration.zero);
     Provider.of<BinaryHeapModel<Task>>(context, listen: false).insert(newTask);
     setState(() {
       _taskNameController.clear();
