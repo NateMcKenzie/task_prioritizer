@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/edit_page.dart';
 import 'package:task_prioritizer/home_page.dart';
-import 'package:task_prioritizer/task.dart';
 
 void main() {
-  BinaryHeapModel<Task> taskHeap = BinaryHeapModel.empty();
-  runApp(ChangeNotifierProvider<BinaryHeapModel<Task>>(
+  BinaryHeapModel taskHeap = BinaryHeapModel.empty();
+  runApp(ChangeNotifierProvider<BinaryHeapModel>(
     create: (context) => taskHeap,
     child: const TaskApp(),
   ));

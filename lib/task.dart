@@ -5,8 +5,18 @@ class Task implements Comparable {
   String name;
   String description;
 
-  Task(this.name, this.description, this.requiredEstimate, this.dueDate,
-      this.timeSpent);
+  Task(this.name, this.description, this.requiredEstimate, this.dueDate, this.timeSpent);
+
+  Task.parse(String string)
+      : name = '',
+        description = '',
+        requiredEstimate = Duration.zero,
+        dueDate = DateTime.now(),
+        timeSpent = Duration.zero {
+    List<String> items = string.split(",");
+    name = items[0];
+    description = items[1];
+  }
 
   @override
   int compareTo(other) {
@@ -19,6 +29,15 @@ class Task implements Comparable {
     int minutesLeft = timeLeft.inMinutes;
     int minutesRequired = requiredEstimate.inMinutes - timeSpent.inMinutes;
     return minutesLeft - minutesRequired;
+  }
+
+  String toCSV() {
+    String returnString = '$name,';
+    returnString += ('$description,');
+    returnString += ('$requiredEstimate,');
+    returnString += ('$dueDate,');
+    returnString += ('$timeSpent,');
+    return returnString;
   }
 
   @override

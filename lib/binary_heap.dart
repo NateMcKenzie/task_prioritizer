@@ -1,26 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:task_prioritizer/task.dart';
 
-class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
-  List<T> _heap = [];
+class BinaryHeapModel extends ChangeNotifier {
+  List<Task> _heap = [];
   get isEmpty => _heap.isEmpty;
+  get heap => _heap;
 
   BinaryHeapModel.empty();
 
-  BinaryHeapModel.fromList(List<T> list) {
-    this._heap = List.from(list);
+  BinaryHeapModel.fromList(List<Task> list) {
+    _heap = List.from(list);
   }
 
-  BinaryHeapModel<T> clone() {
+  BinaryHeapModel clone() {
     return BinaryHeapModel.fromList(_heap);
   }
 
-  T pop() {
+  void loadList(List<String>? stringList) {
+    if (stringList == null) return;
+    _heap = [];
+    for (String line in stringList) {
+      _heap.add(Task.parse(line));
+    }
+    //TODO: heap is updating in here, but not reflecting on screen.
+    print(_heap);
+  }
+
+  Task pop() {
     if (_heap.isEmpty) {
       throw StateError('Heap is empty. Cannot extract minimum element.');
     }
 
     // Pop root, move last element to root
-    T returnValue = _heap[0];
+    Task returnValue = _heap[0];
     _swap(0, _heap.length - 1);
     _heap.removeLast();
 
@@ -63,7 +75,7 @@ class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
     return returnValue;
   }
 
-  T peek() {
+  Task peek() {
     if (_heap.isEmpty) {
       throw StateError('Heap is empty. Cannot extract minimum element.');
     }
@@ -71,7 +83,7 @@ class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
     return _heap[0];
   }
 
-  void insert(T value) {
+  void insert(Task value) {
     // Insert at end of array always
     _heap.add(value);
 
@@ -87,7 +99,7 @@ class BinaryHeapModel<T extends Comparable> extends ChangeNotifier {
   }
 
   void _swap(int index1, int index2) {
-    T temp = _heap[index1];
+    Task temp = _heap[index1];
     _heap[index1] = _heap[index2];
     _heap[index2] = temp;
   }

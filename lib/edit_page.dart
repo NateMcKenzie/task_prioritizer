@@ -15,14 +15,15 @@ class _EditPageState extends State<EditPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> taskCards = [];
-    BinaryHeapModel<Task> originalHeap =
-        Provider.of<BinaryHeapModel<Task>>(context, listen: false);
-    BinaryHeapModel<Task> cloneHeap = originalHeap.clone();
+    BinaryHeapModel originalHeap = Provider.of<BinaryHeapModel>(context, listen: false);
+    BinaryHeapModel cloneHeap = originalHeap.clone();
     while (!cloneHeap.isEmpty) {
-      taskCards.add(taskCard(cloneHeap.pop()));
+      taskCards.add(editTaskCard(cloneHeap.pop()));
     }
-    return ListView(
-      children: taskCards,
-    );
+    return ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300.0, minHeight: 400.0),
+        child: ListView(
+          children: taskCards,
+        ));
   }
 }

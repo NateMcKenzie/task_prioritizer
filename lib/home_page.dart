@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/task.dart';
 import 'package:task_prioritizer/task_card.dart';
@@ -14,15 +15,28 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskNameController = TextEditingController();
-  final TextEditingController _taskDescriptionController =
-      TextEditingController();
-  final TextEditingController _taskTimeEstimateController =
-      TextEditingController();
+  final TextEditingController _taskDescriptionController = TextEditingController();
+  final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
+  SharedPreferences? prefs;
+
+  _HomePageState() {
+    loadPrefs();
+  }
+
+  Future<void> loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
+      taskDisplay(),
       Form(
           child: Container(
         margin: const EdgeInsets.all(80),
@@ -31,12 +45,33 @@ class _HomePageState extends State<HomePage> {
           children: formInputs(),
         ),
       )),
+      ElevatedButton(
+          onPressed: () async {
+            List<Task> taskList = Provider.of<BinaryHeapModel>(context, listen: false).heap;
+            List<String> stringList = [];
+            for (Task task in taskList) {
+              stringList.add(task.toCSV());
+            }
+            await prefs!.setStringList("heap", stringList);
+          },
+          child: const Text("Save")),
+      Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+        return ElevatedButton(
+            onPressed: () {
+              setState(() {
+                if (prefs != null) {
+                  List<String>? list = prefs!.getStringList("heap");
+                  heap.loadList(list);
+                }
+              });
+            },
+            child: const Text("Load"));
+      })
     ]);
   }
 
   List<Widget> formInputs() {
     return [
-      taskDisplay(),
       Container(
         margin: const EdgeInsets.all(8),
         child: TextFormField(
@@ -67,9 +102,7 @@ class _HomePageState extends State<HomePage> {
               hintText: 'How many hours will it take?',
               labelText: 'Time Estimate',
             ),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
-            ],
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))],
             controller: _taskTimeEstimateController,
           )),
       Container(
@@ -92,9 +125,7 @@ class _HomePageState extends State<HomePage> {
       ElevatedButton(
         onPressed: () {
           setState(() {
-            Task popped =
-                Provider.of<BinaryHeapModel<Task>>(context, listen: false)
-                    .pop();
+            Task popped = Provider.of<BinaryHeapModel>(context).pop();
             print(popped.toString());
           });
         },
@@ -104,7 +135,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget taskDisplay() {
-    return Consumer<BinaryHeapModel<Task>>(builder: (context, heap, child) {
+    return Consumer<BinaryHeapModel>(builder: (context, heap, child) {
       if (!heap.isEmpty) {
         return taskCard(heap.peek());
       } else {
@@ -118,12 +149,10 @@ class _HomePageState extends State<HomePage> {
     String taskDescription = _taskDescriptionController.text;
     double taskTimeEstimate = double.parse(_taskTimeEstimateController.text);
     DateTime taskDueDate = DateTime.parse(_taskDueDateController.text);
-    Duration taskTimeDuration = Duration(
-        hours: taskTimeEstimate.toInt(),
-        minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
-    Task newTask = Task(taskName, taskDescription, taskTimeDuration,
-        taskDueDate, Duration.zero);
-    Provider.of<BinaryHeapModel<Task>>(context, listen: false).insert(newTask);
+    Duration taskTimeDuration =
+        Duration(hours: taskTimeEstimate.toInt(), minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
+    Task newTask = Task(taskName, taskDescription, taskTimeDuration, taskDueDate, Duration.zero);
+    Provider.of<BinaryHeapModel>(context, listen: false).insert(newTask);
     setState(() {
       _taskNameController.clear();
       _taskDescriptionController.clear();
