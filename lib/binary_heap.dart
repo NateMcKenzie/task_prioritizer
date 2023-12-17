@@ -103,11 +103,7 @@ class BinaryHeapModel extends ChangeNotifier {
 
   void updateRootSpent(Duration hoursSpent) {
     _heap[0].timeSpent = hoursSpent;
-    if (_heap[0].requiredEstimate - _heap[0].timeSpent <= Duration.zero) {
-      pop();
-    } else {
-      percolateDown();
-    }
+    percolateDown();
   }
 
   Duration getRootSpent() {
