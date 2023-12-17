@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_prioritizer/binary_heap.dart';
-import 'package:task_prioritizer/task.dart';
 import 'package:task_prioritizer/task_card.dart';
 
 class EditPage extends StatefulWidget {

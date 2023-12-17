@@ -22,8 +22,6 @@ class BinaryHeapModel extends ChangeNotifier {
     for (String line in stringList) {
       _heap.add(Task.parse(line));
     }
-    //TODO: heap is updating in here, but not reflecting on screen.
-    print(_heap);
   }
 
   Task pop() {
@@ -36,6 +34,35 @@ class BinaryHeapModel extends ChangeNotifier {
     _swap(0, _heap.length - 1);
     _heap.removeLast();
 
+    percolateDown();
+
+    return returnValue;
+  }
+
+  Task peek() {
+    if (_heap.isEmpty) {
+      throw StateError('Heap is empty. Cannot extract minimum element.');
+    }
+
+    return _heap[0];
+  }
+
+  void insert(Task value) {
+    // Insert at end of array always
+    _heap.add(value);
+
+    // Swap up until heapified
+    int pivot = _heap.length - 1;
+    int parent = _parent(pivot);
+    while (_heap[pivot].compareTo(_heap[parent]) < 0) {
+      _swap(pivot, parent);
+      pivot = parent;
+      parent = _parent(pivot);
+    }
+    notifyListeners();
+  }
+
+  void percolateDown() {
     // Swap down until heapified
     int pivot = 0;
     int leftChild = _leftChild(pivot);
@@ -72,30 +99,19 @@ class BinaryHeapModel extends ChangeNotifier {
     }
 
     notifyListeners();
-    return returnValue;
   }
 
-  Task peek() {
-    if (_heap.isEmpty) {
-      throw StateError('Heap is empty. Cannot extract minimum element.');
+  void updateRootSpent(Duration hoursSpent) {
+    _heap[0].timeSpent = hoursSpent;
+    if (_heap[0].requiredEstimate - _heap[0].timeSpent <= Duration.zero) {
+      pop();
+    } else {
+      percolateDown();
     }
-
-    return _heap[0];
   }
 
-  void insert(Task value) {
-    // Insert at end of array always
-    _heap.add(value);
-
-    // Swap up until heapified
-    int pivot = _heap.length - 1;
-    int parent = _parent(pivot);
-    while (_heap[pivot].compareTo(_heap[parent]) < 0) {
-      _swap(pivot, parent);
-      pivot = parent;
-      parent = _parent(pivot);
-    }
-    notifyListeners();
+  Duration getRootSpent() {
+    return _heap[0].timeSpent;
   }
 
   void _swap(int index1, int index2) {

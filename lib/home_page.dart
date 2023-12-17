@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/task.dart';
+import 'package:task_prioritizer/helpers.dart';
 import 'package:task_prioritizer/task_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _taskTimeEstimateController = TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
   SharedPreferences? prefs;
+  Duration spentUpdater = Duration.zero;
 
   _HomePageState() {
     loadPrefs();
@@ -36,7 +38,44 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
-      taskDisplay(),
+      Column(children: [
+        taskDisplay(),
+        Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+          if (heap.isEmpty) return Container();
+          Duration taskSpent = heap.getRootSpent();
+          if (taskSpent > spentUpdater) spentUpdater = taskSpent;
+          return Row(
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      spentUpdater += const Duration(minutes: 15);
+                      if (spentUpdater < Duration.zero) spentUpdater = Duration.zero;
+                    });
+                  },
+                  child: const Text("-")),
+              Text(formatDuration(spentUpdater)),
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      spentUpdater += const Duration(minutes: 15);
+                    });
+                  },
+                  child: const Text("+")),
+              Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+                return ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        heap.updateRootSpent(spentUpdater);
+                        spentUpdater = heap.getRootSpent();
+                      });
+                    },
+                    child: const Text("Update"));
+              }),
+            ],
+          );
+        }),
+      ]),
       Form(
           child: Container(
         margin: const EdgeInsets.all(80),
@@ -122,15 +161,15 @@ class _HomePageState extends State<HomePage> {
         },
         child: const Text('Submit'),
       ),
-      ElevatedButton(
-        onPressed: () {
-          setState(() {
-            Task popped = Provider.of<BinaryHeapModel>(context).pop();
-            print(popped.toString());
-          });
-        },
-        child: const Text('Pop'),
-      ),
+      Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+        return ElevatedButton(
+            onPressed: () {
+              setState(() {
+                heap.pop();
+              });
+            },
+            child: const Text('Pop'));
+      }),
     ];
   }
 

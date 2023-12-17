@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_prioritizer/task.dart';
+import 'package:task_prioritizer/helpers.dart';
 
 Widget taskCard(Task task) {
   return ConstrainedBox(
@@ -33,16 +34,13 @@ Widget taskCard(Task task) {
                         color: Colors.black,
                         width: 1.0,
                       ),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(8.0)),
+                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                     ),
                     child: Column(
                       children: [
-                        Text(
-                            "Estimated: ${formatDuration(task.requiredEstimate)}"),
+                        Text("Estimated: ${formatDuration(task.requiredEstimate)}"),
                         Text("Spent: ${formatDuration(task.timeSpent)}"),
-                        Text(
-                            "Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
+                        Text("Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
                       ],
                     )),
               ),
@@ -85,16 +83,13 @@ Widget editTaskCard(Task task) {
                         color: Colors.black,
                         width: 1.0,
                       ),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(8.0)),
+                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                     ),
                     child: Column(
                       children: [
-                        Text(
-                            "Estimated: ${formatDuration(task.requiredEstimate)}"),
+                        Text("Estimated: ${formatDuration(task.requiredEstimate)}"),
                         Text("Spent: ${formatDuration(task.timeSpent)}"),
-                        Text(
-                            "Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
+                        Text("Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
                       ],
                     )),
               ),
@@ -104,12 +99,4 @@ Widget editTaskCard(Task task) {
           ),
         ),
       ));
-}
-
-String formatDuration(Duration duration) {
-  int hours = duration.inHours;
-  int minutes = (duration.inMinutes % 60).toInt();
-
-  String formattedDuration = '$hours h $minutes min';
-  return formattedDuration;
 }
