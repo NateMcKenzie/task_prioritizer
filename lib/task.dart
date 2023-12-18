@@ -16,6 +16,9 @@ class Task implements Comparable {
     List<String> items = string.split(",");
     name = items[0];
     description = items[1];
+    requiredEstimate = Duration(minutes: int.parse(items[2]));
+    dueDate = DateTime.parse(items[3]);
+    timeSpent = Duration(minutes: int.parse(items[4]));
   }
 
   @override
@@ -34,9 +37,10 @@ class Task implements Comparable {
   String toCSV() {
     String returnString = '$name,';
     returnString += ('$description,');
-    returnString += ('$requiredEstimate,');
+    returnString += ('${requiredEstimate.inMinutes},');
     returnString += ('$dueDate,');
-    returnString += ('$timeSpent,');
+    returnString += ('${timeSpent.inMinutes},');
+    print(returnString);
     return returnString;
   }
 
