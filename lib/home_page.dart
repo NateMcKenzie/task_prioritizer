@@ -16,8 +16,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _taskNameController = TextEditingController();
-  final TextEditingController _taskDescriptionController = TextEditingController();
-  final TextEditingController _taskTimeEstimateController = TextEditingController();
+  final TextEditingController _taskDescriptionController =
+      TextEditingController();
+  final TextEditingController _taskTimeEstimateController =
+      TextEditingController();
   final TextEditingController _taskDueDateController = TextEditingController();
   SharedPreferences? prefs;
   Duration spentUpdater = Duration.zero;
@@ -46,11 +48,14 @@ class _HomePageState extends State<HomePage> {
           if (taskSpent > spentUpdater) spentUpdater = taskSpent;
           return Row(
             children: [
+              const Spacer(),
               ElevatedButton(
                   onPressed: () {
                     setState(() {
                       spentUpdater += const Duration(minutes: 15);
-                      if (spentUpdater < Duration.zero) spentUpdater = Duration.zero;
+                      if (spentUpdater < Duration.zero) {
+                        spentUpdater = Duration.zero;
+                      }
                     });
                   },
                   child: const Text("-")),
@@ -72,6 +77,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: const Text("Update"));
               }),
+              const Spacer(),
             ],
           );
         }),
@@ -84,28 +90,34 @@ class _HomePageState extends State<HomePage> {
           children: formInputs(),
         ),
       )),
-      ElevatedButton(
-          onPressed: () async {
-            List<Task> taskList = Provider.of<BinaryHeapModel>(context, listen: false).heap;
-            List<String> stringList = [];
-            for (Task task in taskList) {
-              stringList.add(task.toCSV());
-            }
-            await prefs!.setStringList("heap", stringList);
-          },
-          child: const Text("Save")),
-      Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-        return ElevatedButton(
-            onPressed: () {
-              setState(() {
-                if (prefs != null) {
-                  List<String>? list = prefs!.getStringList("heap");
-                  heap.loadList(list);
-                }
-              });
+      Padding(
+        padding: const EdgeInsets.all(8),
+        child: ElevatedButton(
+            onPressed: () async {
+              List<Task> taskList =
+                  Provider.of<BinaryHeapModel>(context, listen: false).heap;
+              List<String> stringList = [];
+              for (Task task in taskList) {
+                stringList.add(task.toCSV());
+              }
+              await prefs!.setStringList("heap", stringList);
             },
-            child: const Text("Load"));
-      })
+            child: const Text("Save")),
+      ),
+      Padding(
+          padding: const EdgeInsets.all(8),
+          child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+            return ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    if (prefs != null) {
+                      List<String>? list = prefs!.getStringList("heap");
+                      heap.loadList(list);
+                    }
+                  });
+                },
+                child: const Text("Load"));
+          })),
     ]);
   }
 
@@ -141,7 +153,9 @@ class _HomePageState extends State<HomePage> {
               hintText: 'How many hours will it take?',
               labelText: 'Time Estimate',
             ),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
+            ],
             controller: _taskTimeEstimateController,
           )),
       Container(
@@ -155,21 +169,26 @@ class _HomePageState extends State<HomePage> {
           controller: _taskDueDateController,
         ),
       ),
-      ElevatedButton(
-        onPressed: () {
-          _addTask();
-        },
-        child: const Text('Submit'),
-      ),
-      Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-        return ElevatedButton(
+      Padding(
+          padding: const EdgeInsets.all(8),
+          child: ElevatedButton(
             onPressed: () {
-              setState(() {
-                heap.pop();
-              });
+              _addTask();
             },
-            child: const Text('Pop'));
-      }),
+            child: const Text('Submit'),
+          )),
+      Padding(
+        padding: const EdgeInsets.all(8),
+        child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+          return ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  if (!heap.isEmpty) heap.pop();
+                });
+              },
+              child: const Text('Pop'));
+        }),
+      ),
     ];
   }
 
@@ -184,13 +203,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addTask() {
-    String taskName = _taskNameController.text;
-    String taskDescription = _taskDescriptionController.text;
-    double taskTimeEstimate = double.parse(_taskTimeEstimateController.text);
-    DateTime taskDueDate = DateTime.parse(_taskDueDateController.text);
-    Duration taskTimeDuration =
-        Duration(hours: taskTimeEstimate.toInt(), minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
-    Task newTask = Task(taskName, taskDescription, taskTimeDuration, taskDueDate, Duration.zero);
+    Task? newTask = readInput();
+    if (newTask == null) return;
     Provider.of<BinaryHeapModel>(context, listen: false).insert(newTask);
     setState(() {
       _taskNameController.clear();
@@ -198,5 +212,36 @@ class _HomePageState extends State<HomePage> {
       _taskTimeEstimateController.clear();
       _taskDueDateController.clear();
     });
+  }
+
+  //TODO: Fails quietly instead of telling the user their error.
+  Task? readInput() {
+    String taskName;
+    String taskDescription;
+    double? taskTimeEstimate;
+    DateTime? taskDueDate;
+    Duration taskTimeDuration;
+
+    //Read inputs into varialbes, return null if anything is wrong.
+    if (_taskNameController.text.isNotEmpty) {
+      taskName = _taskNameController.text;
+    } else {
+      return null;
+    }
+    if (_taskDescriptionController.text.isNotEmpty) {
+      taskDescription = _taskDescriptionController.text;
+    } else {
+      return null;
+    }
+    taskTimeEstimate = double.tryParse(_taskTimeEstimateController.text);
+    if (taskTimeEstimate == null) return null;
+    taskDueDate = DateTime.tryParse(_taskDueDateController.text);
+    if (taskDueDate == null) return null;
+    taskTimeDuration = Duration(
+        hours: taskTimeEstimate.toInt(),
+        minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
+
+    return Task(taskName, taskDescription, taskTimeDuration, taskDueDate,
+        Duration.zero);
   }
 }

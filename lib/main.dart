@@ -24,6 +24,7 @@ class _TaskAppState extends State<TaskApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(useMaterial3: true),
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(title: const Text("Task Prioritizer")),
           body: PageView(

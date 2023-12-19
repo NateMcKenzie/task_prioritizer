@@ -83,7 +83,8 @@ class BinaryHeapModel extends ChangeNotifier {
       // Swap if pivot is larger than either child
       if (leftSmall || rightSmall) {
         //Swap with smallest child, move pivot pointer
-        if ((leftSmall && !rightSmall) || _heap[leftChild].compareTo(_heap[rightChild]) < 0) {
+        if ((leftSmall && !rightSmall) ||
+            _heap[leftChild].compareTo(_heap[rightChild]) < 0) {
           _swap(leftChild, pivot);
           pivot = leftChild;
         } else {

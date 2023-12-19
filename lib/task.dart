@@ -5,7 +5,8 @@ class Task implements Comparable {
   String name;
   String description;
 
-  Task(this.name, this.description, this.requiredEstimate, this.dueDate, this.timeSpent);
+  Task(this.name, this.description, this.requiredEstimate, this.dueDate,
+      this.timeSpent);
 
   Task.parse(String string)
       : name = '',
@@ -40,7 +41,6 @@ class Task implements Comparable {
     returnString += ('${requiredEstimate.inMinutes},');
     returnString += ('$dueDate,');
     returnString += ('${timeSpent.inMinutes},');
-    print(returnString);
     return returnString;
   }
 
