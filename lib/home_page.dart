@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      spentUpdater += const Duration(minutes: 15);
+                      spentUpdater -= const Duration(minutes: 15);
                       if (spentUpdater < Duration.zero) {
                         spentUpdater = Duration.zero;
                       }
