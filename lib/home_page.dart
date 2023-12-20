@@ -228,15 +228,15 @@ class _HomePageState extends State<HomePage> {
     } else {
       return null;
     }
-    if (_taskDescriptionController.text.isNotEmpty) {
-      taskDescription = _taskDescriptionController.text;
-    } else {
-      return null;
-    }
+
+    taskDescription = _taskDescriptionController.text;
+
     taskTimeEstimate = double.tryParse(_taskTimeEstimateController.text);
     if (taskTimeEstimate == null) return null;
+
     taskDueDate = DateTime.tryParse(_taskDueDateController.text);
     if (taskDueDate == null) return null;
+
     taskTimeDuration = Duration(
         hours: taskTimeEstimate.toInt(),
         minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
