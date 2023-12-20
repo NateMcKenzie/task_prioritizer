@@ -20,7 +20,8 @@ class _HomePageState extends State<HomePage> {
       TextEditingController();
   final TextEditingController _taskTimeEstimateController =
       TextEditingController();
-  final TextEditingController _taskDueDateController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = const TimeOfDay(hour: 23, minute: 0);
   SharedPreferences? prefs;
   Duration spentUpdater = Duration.zero;
 
@@ -160,21 +161,20 @@ class _HomePageState extends State<HomePage> {
           )),
       Container(
         margin: const EdgeInsets.all(8),
-        child: TextFormField(
-          decoration: const InputDecoration(
-            icon: Icon(Icons.calendar_today),
-            hintText: 'yyyy-mm-ddThh:mm',
-            labelText: 'Due Date',
-          ),
-          controller: _taskDueDateController,
-        ),
+        child: ElevatedButton(
+            onPressed: () => _selectDate(context),
+            child: Text(selectedDate.toString())),
+      ),
+      Container(
+        margin: const EdgeInsets.all(8),
+        child: ElevatedButton(
+            onPressed: () => _selectTime(context),
+            child: Text(selectedTime.toString())),
       ),
       Padding(
           padding: const EdgeInsets.all(8),
           child: ElevatedButton(
-            onPressed: () {
-              _addTask();
-            },
+            onPressed: _addTask,
             child: const Text('Submit'),
           )),
       Padding(
@@ -202,6 +202,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2023),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    TimeOfDay? picked = await showTimePicker(
+      initialTime: TimeOfDay.now(),
+      context: context,
+    );
+    if (picked != null && picked != selectedTime) {
+      setState(() {
+        selectedTime = picked;
+      });
+    }
+  }
+
   void _addTask() {
     Task? newTask = readInput();
     if (newTask == null) return;
@@ -210,7 +235,7 @@ class _HomePageState extends State<HomePage> {
       _taskNameController.clear();
       _taskDescriptionController.clear();
       _taskTimeEstimateController.clear();
-      _taskDueDateController.clear();
+      selectedDate = DateTime.now();
     });
   }
 
@@ -218,8 +243,8 @@ class _HomePageState extends State<HomePage> {
   Task? readInput() {
     String taskName;
     String taskDescription;
+    DateTime dueDate;
     double? taskTimeEstimate;
-    DateTime? taskDueDate;
     Duration taskTimeDuration;
 
     //Read inputs into varialbes, return null if anything is wrong.
@@ -231,17 +256,17 @@ class _HomePageState extends State<HomePage> {
 
     taskDescription = _taskDescriptionController.text;
 
+    dueDate = DateTime(selectedDate.year, selectedDate.month, selectedDate.day,
+        selectedTime.hour, selectedTime.minute);
+
     taskTimeEstimate = double.tryParse(_taskTimeEstimateController.text);
     if (taskTimeEstimate == null) return null;
-
-    taskDueDate = DateTime.tryParse(_taskDueDateController.text);
-    if (taskDueDate == null) return null;
 
     taskTimeDuration = Duration(
         hours: taskTimeEstimate.toInt(),
         minutes: int.parse((taskTimeEstimate % 1 * 60).toStringAsFixed(0)));
 
-    return Task(taskName, taskDescription, taskTimeDuration, taskDueDate,
-        Duration.zero);
+    return Task(
+        taskName, taskDescription, taskTimeDuration, dueDate, Duration.zero);
   }
 }
