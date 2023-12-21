@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:task_prioritizer/task.dart';
 import 'package:task_prioritizer/helpers.dart';
 
@@ -48,7 +47,7 @@ Widget taskCard(Task task) {
                     )),
               ),
               const SizedBox(height: 8.0),
-              Text("Due date: ${DateFormat('MMMM d, y').format(task.dueDate)}"),
+              Text(textAlign:TextAlign.right, "${formatDate(task.dueDate)}\n${formatTime(dateTime:task.dueDate)}"),
             ],
           ),
         ),

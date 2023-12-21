@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _taskTimeEstimateController =
       TextEditingController();
   DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = const TimeOfDay(hour: 23, minute: 0);
+  TimeOfDay selectedTime = const TimeOfDay(hour: 23, minute: 59);
   SharedPreferences? prefs;
   Duration spentUpdater = Duration.zero;
 
@@ -88,6 +88,7 @@ class _HomePageState extends State<HomePage> {
         margin: const EdgeInsets.all(80),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: formInputs(),
         ),
       )),
@@ -161,15 +162,22 @@ class _HomePageState extends State<HomePage> {
           )),
       Container(
         margin: const EdgeInsets.all(8),
-        child: ElevatedButton(
-            onPressed: () => _selectDate(context),
-            child: Text(selectedDate.toString())),
-      ),
-      Container(
-        margin: const EdgeInsets.all(8),
-        child: ElevatedButton(
-            onPressed: () => _selectTime(context),
-            child: Text(selectedTime.toString())),
+        child: Row(children: [
+          const Icon(Icons.event),
+          Container(
+            margin: const EdgeInsets.all(8),
+            child: ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: Text(formatDate(selectedDate)),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(8),
+            child: ElevatedButton(
+                onPressed: () => _selectTime(context),
+                child: Text(formatTime(time: selectedTime))),
+          ),
+        ]),
       ),
       Padding(
           padding: const EdgeInsets.all(8),
@@ -219,6 +227,12 @@ class _HomePageState extends State<HomePage> {
     TimeOfDay? picked = await showTimePicker(
       initialTime: TimeOfDay.now(),
       context: context,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != selectedTime) {
       setState(() {
