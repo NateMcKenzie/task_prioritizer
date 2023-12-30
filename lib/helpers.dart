@@ -11,7 +11,7 @@ String formatDuration(Duration duration) {
 
 // Stub but will help consistency.
 String formatDate(DateTime date) {
-  return DateFormat('MMMM d, y').format(date);
+  return DateFormat('MMMM, d, y').format(date);
 }
 
 /// Returns a formatted string. Accepts a TimeOfDay or DateTime, defaulting to the former if both are given.

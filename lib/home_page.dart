@@ -40,7 +40,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
+    return Container(
+      margin: const EdgeInsets.all(20),
+      child:
+        ListView(children: [
       Column(children: [
         taskDisplay(),
         Consumer<BinaryHeapModel>(builder: (context, heap, child) {
@@ -85,7 +88,7 @@ class _HomePageState extends State<HomePage> {
       ]),
       Form(
           child: Container(
-        margin: const EdgeInsets.all(80),
+        margin: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -120,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: const Text("Load"));
           })),
-    ]);
+    ]));
   }
 
   List<Widget> formInputs() {
