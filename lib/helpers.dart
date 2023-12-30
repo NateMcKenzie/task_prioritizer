@@ -2,10 +2,11 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 String formatDuration(Duration duration) {
-  int hours = duration.inHours;
-  int minutes = (duration.inMinutes % 60).toInt();
+  NumberFormat formatter = NumberFormat("00");
+  int hour = duration.inHours;
+  int minute = (duration.inMinutes % 60).toInt();
 
-  String formattedDuration = '$hours h $minutes min';
+  String formattedDuration = '${formatter.format(hour)}:${formatter.format(minute)}';
   return formattedDuration;
 }
 

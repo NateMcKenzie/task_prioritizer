@@ -25,6 +25,8 @@ Widget taskCard(Task task) {
               ),
               Text(task.description),
               const SizedBox(height: 8.0),
+              Text(textAlign:TextAlign.right, "${formatDate(task.dueDate)}  ${formatTime(dateTime:task.dueDate)}"),
+              const SizedBox(height: 8.0),
               Center(
                 child: Container(
                     padding: const EdgeInsets.all(8.0),
@@ -38,16 +40,10 @@ Widget taskCard(Task task) {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                            "Estimated: ${formatDuration(task.requiredEstimate)}"),
-                        Text("Spent: ${formatDuration(task.timeSpent)}"),
-                        Text(
-                            "Remaining: ${formatDuration(task.requiredEstimate - task.timeSpent)}"),
+                        Text("${formatDuration(task.timeSpent)} of ${formatDuration(task.requiredEstimate)} | ${formatDuration(task.requiredEstimate - task.timeSpent)} remaining"),
                       ],
                     )),
               ),
-              const SizedBox(height: 8.0),
-              Text(textAlign:TextAlign.right, "${formatDate(task.dueDate)}\n${formatTime(dateTime:task.dueDate)}"),
             ],
           ),
         ),

@@ -170,9 +170,38 @@ class _HomePageState extends State<HomePage> {
                     child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: Column(children: [
-                          const Text("Progress"),
                           Row(children: [
-                            Text(formatDuration(spentUpdater)),
+                            Column(children: [
+                              Text(formatDuration(spentUpdater)),
+                            Row(
+                              children: [
+                                Consumer<BinaryHeapModel>(
+                                    builder: (context, heap, child) {
+                                  return ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          heap.updateRootSpent(spentUpdater);
+                                          spentUpdater = heap.getRootSpent();
+                                        });
+                                      },
+                                      child: const Text("Update"));
+                                }),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Consumer<BinaryHeapModel>(
+                                      builder: (context, heap, child) {
+                                    return ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (!heap.isEmpty) heap.pop();
+                                          });
+                                        },
+                                        child: const Text('Complete'));
+                                  }),
+                                )
+                              ],
+                            ),
+                            ]),
                             Column(
                               children: [
                                 TextButton(
@@ -197,34 +226,6 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ]),
-                          Row(
-                            children: [
-                              Consumer<BinaryHeapModel>(
-                                  builder: (context, heap, child) {
-                                return ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        heap.updateRootSpent(spentUpdater);
-                                        spentUpdater = heap.getRootSpent();
-                                      });
-                                    },
-                                    child: const Text("Update"));
-                              }),
-                              Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: Consumer<BinaryHeapModel>(
-                                    builder: (context, heap, child) {
-                                  return ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          if (!heap.isEmpty) heap.pop();
-                                        });
-                                      },
-                                      child: const Text('Complete'));
-                                }),
-                              )
-                            ],
-                          )
                         ]))),
                 const Spacer(),
               ],
