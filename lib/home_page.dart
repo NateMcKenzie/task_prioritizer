@@ -43,9 +43,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
         margin: const EdgeInsets.all(20),
         child: ListView(children: [
-          Column(children: [
-            taskDisplay(),
-          ]),
+          taskDisplay(),
           Form(
               child: Container(
             margin: const EdgeInsets.all(20),
@@ -55,34 +53,44 @@ class _HomePageState extends State<HomePage> {
               children: formInputs(),
             ),
           )),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: ElevatedButton(
-                onPressed: () async {
-                  List<Task> taskList =
-                      Provider.of<BinaryHeapModel>(context, listen: false).heap;
-                  List<String> stringList = [];
-                  for (Task task in taskList) {
-                    stringList.add(task.toCSV());
-                  }
-                  await prefs!.setStringList("heap", stringList);
-                },
-                child: const Text("Save")),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
+            child: Divider(),
           ),
-          Padding(
+          Center(
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Padding(
+                padding: const EdgeInsets.all(8),
+                child:
+                    Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+                  return ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (prefs != null) {
+                            List<String>? list = prefs!.getStringList("heap");
+                            heap.loadList(list);
+                          }
+                        });
+                      },
+                      child: const Text("Load"));
+                })),
+            Padding(
               padding: const EdgeInsets.all(8),
-              child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-                return ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        if (prefs != null) {
-                          List<String>? list = prefs!.getStringList("heap");
-                          heap.loadList(list);
-                        }
-                      });
-                    },
-                    child: const Text("Load"));
-              })),
+              child: ElevatedButton(
+                  onPressed: () async {
+                    List<Task> taskList =
+                        Provider.of<BinaryHeapModel>(context, listen: false)
+                            .heap;
+                    List<String> stringList = [];
+                    for (Task task in taskList) {
+                      stringList.add(task.toCSV());
+                    }
+                    await prefs!.setStringList("heap", stringList);
+                  },
+                  child: const Text("Save")),
+            ),
+          ]))
         ]));
   }
 
@@ -124,26 +132,26 @@ class _HomePageState extends State<HomePage> {
             controller: _taskTimeEstimateController,
           )),
       Container(
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.fromLTRB(8, 16, 8, 8),
         child: Row(children: [
           const Icon(Icons.event),
           Container(
-            margin: const EdgeInsets.all(8),
-            child: ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text(formatDate(selectedDate)),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(8),
-            child: ElevatedButton(
-                onPressed: () => _selectTime(context),
-                child: Text(formatTime(time: selectedTime))),
-          ),
+              margin: const EdgeInsets.only(left: 18),
+              decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey))),
+              child: Row(children: [
+                TextButton(
+                  onPressed: () => _selectDate(context),
+                  child: Text(formatDate(selectedDate)),
+                ),
+                TextButton(
+                    onPressed: () => _selectTime(context),
+                    child: Text(formatTime(time: selectedTime))),
+              ])),
         ]),
       ),
       Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.fromLTRB(8,48,8,8),
           child: ElevatedButton(
             onPressed: _addTask,
             child: const Text('Submit'),
@@ -212,6 +220,9 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: const Text('Complete'));
             }),
+          ),const Padding(
+            padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
+            child: Divider(),
           )
         ]);
       } else {
