@@ -41,89 +41,49 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      child:
-        ListView(children: [
-      Column(children: [
-        taskDisplay(),
-        Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-          if (heap.isEmpty) return Container();
-          Duration taskSpent = heap.getRootSpent();
-          if (taskSpent > spentUpdater) spentUpdater = taskSpent;
-          return Row(
-            children: [
-              const Spacer(),
-              ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      spentUpdater -= const Duration(minutes: 15);
-                      if (spentUpdater < Duration.zero) {
-                        spentUpdater = Duration.zero;
-                      }
-                    });
-                  },
-                  child: const Text("-")),
-              Text(formatDuration(spentUpdater)),
-              ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      spentUpdater += const Duration(minutes: 15);
-                    });
-                  },
-                  child: const Text("+")),
-              Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+        margin: const EdgeInsets.all(20),
+        child: ListView(children: [
+          Column(children: [
+            taskDisplay(),
+          ]),
+          Form(
+              child: Container(
+            margin: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: formInputs(),
+            ),
+          )),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: ElevatedButton(
+                onPressed: () async {
+                  List<Task> taskList =
+                      Provider.of<BinaryHeapModel>(context, listen: false).heap;
+                  List<String> stringList = [];
+                  for (Task task in taskList) {
+                    stringList.add(task.toCSV());
+                  }
+                  await prefs!.setStringList("heap", stringList);
+                },
+                child: const Text("Save")),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(8),
+              child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
                 return ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        heap.updateRootSpent(spentUpdater);
-                        spentUpdater = heap.getRootSpent();
+                        if (prefs != null) {
+                          List<String>? list = prefs!.getStringList("heap");
+                          heap.loadList(list);
+                        }
                       });
                     },
-                    child: const Text("Update"));
-              }),
-              const Spacer(),
-            ],
-          );
-        }),
-      ]),
-      Form(
-          child: Container(
-        margin: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: formInputs(),
-        ),
-      )),
-      Padding(
-        padding: const EdgeInsets.all(8),
-        child: ElevatedButton(
-            onPressed: () async {
-              List<Task> taskList =
-                  Provider.of<BinaryHeapModel>(context, listen: false).heap;
-              List<String> stringList = [];
-              for (Task task in taskList) {
-                stringList.add(task.toCSV());
-              }
-              await prefs!.setStringList("heap", stringList);
-            },
-            child: const Text("Save")),
-      ),
-      Padding(
-          padding: const EdgeInsets.all(8),
-          child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-            return ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    if (prefs != null) {
-                      List<String>? list = prefs!.getStringList("heap");
-                      heap.loadList(list);
-                    }
-                  });
-                },
-                child: const Text("Load"));
-          })),
-    ]));
+                    child: const Text("Load"));
+              })),
+        ]));
   }
 
   List<Widget> formInputs() {
@@ -188,25 +148,72 @@ class _HomePageState extends State<HomePage> {
             onPressed: _addTask,
             child: const Text('Submit'),
           )),
-      Padding(
-        padding: const EdgeInsets.all(8),
-        child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-          return ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  if (!heap.isEmpty) heap.pop();
-                });
-              },
-              child: const Text('Pop'));
-        }),
-      ),
     ];
   }
 
   Widget taskDisplay() {
     return Consumer<BinaryHeapModel>(builder: (context, heap, child) {
       if (!heap.isEmpty) {
-        return taskCard(heap.peek());
+        return Column(children: [
+          taskCard(heap.peek()),
+          Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+            if (heap.isEmpty) return Container();
+            Duration taskSpent = heap.getRootSpent();
+            if (taskSpent > spentUpdater) spentUpdater = taskSpent;
+            return Row(
+              children: [
+                const Spacer(),
+                Card(
+                    child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Row(children: [
+                          ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  spentUpdater -= const Duration(minutes: 15);
+                                  if (spentUpdater < Duration.zero) {
+                                    spentUpdater = Duration.zero;
+                                  }
+                                });
+                              },
+                              child: const Text("-")),
+                          Text(formatDuration(spentUpdater)),
+                          ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  spentUpdater += const Duration(minutes: 15);
+                                });
+                              },
+                              child: const Text("+")),
+                          Consumer<BinaryHeapModel>(
+                              builder: (context, heap, child) {
+                            return ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    heap.updateRootSpent(spentUpdater);
+                                    spentUpdater = heap.getRootSpent();
+                                  });
+                                },
+                                child: const Text("Update"));
+                          }),
+                        ]))),
+                const Spacer(),
+              ],
+            );
+          }),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+              return ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      if (!heap.isEmpty) heap.pop();
+                    });
+                  },
+                  child: const Text('Complete'));
+            }),
+          )
+        ]);
       } else {
         return Container();
       }
