@@ -40,58 +40,53 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ListView(children: [
+      taskDisplay(),
+      Form(
+          child: Container(
         margin: const EdgeInsets.all(20),
-        child: ListView(children: [
-          taskDisplay(),
-          Form(
-              child: Container(
-            margin: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: formInputs(),
-            ),
-          )),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
-            child: Divider(),
-          ),
-          Center(
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Padding(
-                padding: const EdgeInsets.all(8),
-                child:
-                    Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-                  return ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          if (prefs != null) {
-                            List<String>? list = prefs!.getStringList("heap");
-                            heap.loadList(list);
-                          }
-                        });
-                      },
-                      child: const Text("Load"));
-                })),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: ElevatedButton(
-                  onPressed: () async {
-                    List<Task> taskList =
-                        Provider.of<BinaryHeapModel>(context, listen: false)
-                            .heap;
-                    List<String> stringList = [];
-                    for (Task task in taskList) {
-                      stringList.add(task.toCSV());
-                    }
-                    await prefs!.setStringList("heap", stringList);
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: formInputs(),
+        ),
+      )),
+      const Padding(
+        padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
+        child: Divider(),
+      ),
+      Center(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Padding(
+            padding: const EdgeInsets.all(8),
+            child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+              return ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      if (prefs != null) {
+                        List<String>? list = prefs!.getStringList("heap");
+                        heap.loadList(list);
+                      }
+                    });
                   },
-                  child: const Text("Save")),
-            ),
-          ]))
-        ]));
+                  child: const Text("Load"));
+            })),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: ElevatedButton(
+              onPressed: () async {
+                List<Task> taskList =
+                    Provider.of<BinaryHeapModel>(context, listen: false).heap;
+                List<String> stringList = [];
+                for (Task task in taskList) {
+                  stringList.add(task.toCSV());
+                }
+                await prefs!.setStringList("heap", stringList);
+              },
+              child: const Text("Save")),
+        ),
+      ]))
+    ]);
   }
 
   List<Widget> formInputs() {
@@ -151,7 +146,7 @@ class _HomePageState extends State<HomePage> {
         ]),
       ),
       Padding(
-          padding: const EdgeInsets.fromLTRB(8,48,8,8),
+          padding: const EdgeInsets.fromLTRB(8, 48, 8, 8),
           child: ElevatedButton(
             onPressed: _addTask,
             child: const Text('Submit'),
@@ -174,53 +169,68 @@ class _HomePageState extends State<HomePage> {
                 Card(
                     child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Row(children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  spentUpdater -= const Duration(minutes: 15);
-                                  if (spentUpdater < Duration.zero) {
-                                    spentUpdater = Duration.zero;
-                                  }
-                                });
-                              },
-                              child: const Text("-")),
-                          Text(formatDuration(spentUpdater)),
-                          ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  spentUpdater += const Duration(minutes: 15);
-                                });
-                              },
-                              child: const Text("+")),
-                          Consumer<BinaryHeapModel>(
-                              builder: (context, heap, child) {
-                            return ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    heap.updateRootSpent(spentUpdater);
-                                    spentUpdater = heap.getRootSpent();
-                                  });
-                                },
-                                child: const Text("Update"));
-                          }),
+                        child: Column(children: [
+                          const Text("Progress"),
+                          Row(children: [
+                            Text(formatDuration(spentUpdater)),
+                            Column(
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        spentUpdater +=
+                                            const Duration(minutes: 15);
+                                      });
+                                    },
+                                    child: const Text("+")),
+                                TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        spentUpdater -=
+                                            const Duration(minutes: 15);
+                                        if (spentUpdater < Duration.zero) {
+                                          spentUpdater = Duration.zero;
+                                        }
+                                      });
+                                    },
+                                    child: const Text("-")),
+                              ],
+                            ),
+                          ]),
+                          Row(
+                            children: [
+                              Consumer<BinaryHeapModel>(
+                                  builder: (context, heap, child) {
+                                return ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        heap.updateRootSpent(spentUpdater);
+                                        spentUpdater = heap.getRootSpent();
+                                      });
+                                    },
+                                    child: const Text("Update"));
+                              }),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Consumer<BinaryHeapModel>(
+                                    builder: (context, heap, child) {
+                                  return ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (!heap.isEmpty) heap.pop();
+                                        });
+                                      },
+                                      child: const Text('Complete'));
+                                }),
+                              )
+                            ],
+                          )
                         ]))),
                 const Spacer(),
               ],
             );
           }),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-              return ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (!heap.isEmpty) heap.pop();
-                    });
-                  },
-                  child: const Text('Complete'));
-            }),
-          ),const Padding(
+          const Padding(
             padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
             child: Divider(),
           )
