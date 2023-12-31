@@ -25,6 +25,7 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<BinaryHeapModel>(builder: (context, heap, child) {
     List<Widget> taskCards = [];
     BinaryHeapModel originalHeap =
         Provider.of<BinaryHeapModel>(context, listen: false);
@@ -42,8 +43,8 @@ class _EditPageState extends State<EditPage> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         Padding(
             padding: const EdgeInsets.all(8),
-            child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-              return ElevatedButton(
+            child: 
+              ElevatedButton(
                   onPressed: () {
                     setState(() {
                       if (prefs != null) {
@@ -52,8 +53,8 @@ class _EditPageState extends State<EditPage> {
                       }
                     });
                   },
-                  child: const Text("Load"));
-            })),
+                  child: const Text("Load"))
+            ),
         Padding(
           padding: const EdgeInsets.all(8),
           child: ElevatedButton(
@@ -71,5 +72,6 @@ class _EditPageState extends State<EditPage> {
       ]))],
       ),
     ]);
+  });
   }
 }
