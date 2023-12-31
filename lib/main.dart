@@ -78,6 +78,15 @@ class _TaskAppState extends State<TaskApp> {
           body: PageView(
             children: const [HomePage(), EditPage()],
           ),
+          floatingActionButton: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+            return FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  if (!heap.isEmpty) heap.pop();
+                });
+              },
+              child: const Icon(Icons.check));
+          })
         ));
   }
 }

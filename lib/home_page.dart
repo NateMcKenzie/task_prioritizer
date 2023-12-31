@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_prioritizer/binary_heap.dart';
 import 'package:task_prioritizer/task.dart';
 import 'package:task_prioritizer/helpers.dart';
@@ -22,16 +21,7 @@ class _HomePageState extends State<HomePage> {
       TextEditingController();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = const TimeOfDay(hour: 23, minute: 59);
-  SharedPreferences? prefs;
   Duration spentUpdater = Duration.zero;
-
-  _HomePageState() {
-    loadPrefs();
-  }
-
-  Future<void> loadPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   @override
   void initState() {
@@ -51,41 +41,6 @@ class _HomePageState extends State<HomePage> {
           children: formInputs(),
         ),
       )),
-      const Padding(
-        padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
-        child: Divider(),
-      ),
-      Center(
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Padding(
-            padding: const EdgeInsets.all(8),
-            child: Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-              return ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (prefs != null) {
-                        List<String>? list = prefs!.getStringList("heap");
-                        heap.loadList(list);
-                      }
-                    });
-                  },
-                  child: const Text("Load"));
-            })),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: ElevatedButton(
-              onPressed: () async {
-                List<Task> taskList =
-                    Provider.of<BinaryHeapModel>(context, listen: false).heap;
-                List<String> stringList = [];
-                for (Task task in taskList) {
-                  stringList.add(task.toCSV());
-                }
-                await prefs!.setStringList("heap", stringList);
-              },
-              child: const Text("Save")),
-        ),
-      ]))
     ]);
   }
 
@@ -157,80 +112,52 @@ class _HomePageState extends State<HomePage> {
   Widget taskDisplay() {
     return Consumer<BinaryHeapModel>(builder: (context, heap, child) {
       if (!heap.isEmpty) {
+        Duration taskSpent = heap.getRootSpent();
+        if (taskSpent > spentUpdater) spentUpdater = taskSpent;
         return Column(children: [
           taskCard(heap.peek()),
-          Consumer<BinaryHeapModel>(builder: (context, heap, child) {
-            if (heap.isEmpty) return Container();
-            Duration taskSpent = heap.getRootSpent();
-            if (taskSpent > spentUpdater) spentUpdater = taskSpent;
-            return Row(
-              children: [
-                const Spacer(),
-                Card(
-                    child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(children: [
-                          Row(children: [
-                            Column(children: [
-                              Text(formatDuration(spentUpdater)),
-                            Row(
-                              children: [
-                                Consumer<BinaryHeapModel>(
-                                    builder: (context, heap, child) {
-                                  return ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          heap.updateRootSpent(spentUpdater);
-                                          spentUpdater = heap.getRootSpent();
-                                        });
-                                      },
-                                      child: const Text("Update"));
-                                }),
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Consumer<BinaryHeapModel>(
-                                      builder: (context, heap, child) {
-                                    return ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            if (!heap.isEmpty) heap.pop();
-                                          });
-                                        },
-                                        child: const Text('Complete'));
-                                  }),
-                                )
-                              ],
-                            ),
-                            ]),
-                            Column(
-                              children: [
-                                TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        spentUpdater +=
-                                            const Duration(minutes: 15);
-                                      });
-                                    },
-                                    child: const Text("+")),
-                                TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        spentUpdater -=
-                                            const Duration(minutes: 15);
-                                        if (spentUpdater < Duration.zero) {
-                                          spentUpdater = Duration.zero;
-                                        }
-                                      });
-                                    },
-                                    child: const Text("-")),
-                              ],
-                            ),
-                          ]),
-                        ]))),
-                const Spacer(),
-              ],
-            );
-          }),
+          Center(
+            child: Column(children: [
+              Row(
+                children: [
+                  const Spacer(),
+                  TextButton(
+                      onPressed: () {
+                        setState(() {
+                          spentUpdater -= const Duration(minutes: 15);
+                          if (spentUpdater < Duration.zero) {
+                            spentUpdater = Duration.zero;
+                          }
+                        });
+                      },
+                      child: const Text("-")),
+                  Text(formatDuration(spentUpdater)),
+                  TextButton(
+                      onPressed: () {
+                        setState(() {
+                          spentUpdater += const Duration(minutes: 15);
+                        });
+                      },
+                      child: const Text("+")),
+                  const Spacer(),
+                ],
+              ),
+              Column(
+                children: [
+                  Consumer<BinaryHeapModel>(builder: (context, heap, child) {
+                    return ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            heap.updateRootSpent(spentUpdater);
+                            spentUpdater = heap.getRootSpent();
+                          });
+                        },
+                        child: const Text("Update"));
+                  }),
+                ],
+              ),
+            ]),
+          ),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 24, 0, 24),
             child: Divider(),
